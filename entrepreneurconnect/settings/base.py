@@ -19,6 +19,7 @@ from decouple import config
 import cloudinary
 import cloudinary.api
 import cloudinary.uploader
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,6 +39,7 @@ DEBUG = True
 ALLOWED_HOSTS: List[str] = [
     "localhost",
     "127.0.0.1",
+    "http://localhost:3000",
 ]
 
 # Application definition
@@ -57,6 +59,7 @@ INSTALLED_APPS = [
     'cloudinary',
     #App imports
     'app.user',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -64,11 +67,30 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# White listing the localhost:3000 port
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = default_headers + ("Access-Control-Allow-Origin",)
+
 
 AUTH_USER_MODEL = "user.User"
 
