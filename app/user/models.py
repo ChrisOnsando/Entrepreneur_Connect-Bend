@@ -8,7 +8,7 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from app.abstract import TimeStampedModel
+from app.abstracts import TimeStampedModel
 from cloudinary.models import CloudinaryField
 
 
