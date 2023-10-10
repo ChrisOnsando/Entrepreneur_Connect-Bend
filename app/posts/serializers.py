@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from app.posts.models import Post, Tag
 from app.user.serializers import UserSerializer
+from collections import Counter
 
 User = get_user_model()
 
@@ -25,10 +26,6 @@ class PostSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     author = UserSerializer(read_only=True)
-    description = serializers.CharField(
-        max_length=255,
-        min_length=20,
-    )
     image = serializers.ImageField(use_url=True, required=False)
     body = serializers.CharField(
         min_length=20,
@@ -41,18 +38,19 @@ class PostSerializer(serializers.ModelSerializer):
     taglist = serializers.CharField(
         write_only=True,
     )
+    likes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = (
             "post_id",
             "author",
-            "description",
             "image",
             "body",
             "tags",
             "taglist",
             "slug",
+            "likes_count",
             "created_at",
             "updated_at",
         )
@@ -75,3 +73,6 @@ class PostSerializer(serializers.ModelSerializer):
         post.tags.set(tags)
 
         return post
+
+    def get_likes_count(self, instance: Any) -> Any:
+        return instance.likes.count()

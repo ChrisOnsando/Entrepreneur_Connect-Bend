@@ -7,7 +7,10 @@ from rest_framework.response import Response
 
 from app.posts.models import Post
 from app.posts.permissions import IsOwnerOrReadOnly
-from app.posts.serializers import PostSerializer
+from app.posts.serializers import (
+    PostSerializer,
+)
+from rest_framework.renderers import JSONRenderer
 
 
 class PostListView(generics.ListCreateAPIView):
@@ -22,4 +25,4 @@ class PostListView(generics.ListCreateAPIView):
 class PostListAllView(generics.ListAPIView):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
-   
+

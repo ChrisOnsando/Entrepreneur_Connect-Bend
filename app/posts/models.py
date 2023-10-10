@@ -29,11 +29,20 @@ class Post(TimeStampedModel):
     )
     slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     image = CloudinaryField("post_images", blank=True, null=True)
-    description = models.CharField(max_length=500, blank=True, null=True)
     body = models.TextField()
     tags = models.ManyToManyField(Tag, blank=True, related_name="tags")
     author = models.ForeignKey(
         User, on_delete=models.SET_NULL, related_name="author", null=True
+    )
+    likesCount = models.BigIntegerField(
+        blank=True,
+        default=0,
+    )
+    likes = models.ManyToManyField(
+        User, related_name="likes", blank=True
+    )
+    dislikes = models.ManyToManyField(
+        User, related_name="dislike", blank=True
     )
 
     class Meta:
