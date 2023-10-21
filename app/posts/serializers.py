@@ -5,8 +5,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from app.posts.models import Post, Tag
-from app.user.serializers import UserSerializer
-from collections import Counter
 
 User = get_user_model()
 
@@ -18,14 +16,13 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ("name",)
+        fields = ("name")
 
 
 class PostSerializer(serializers.ModelSerializer):
     post_id = serializers.CharField(
         read_only=True,
     )
-    author = UserSerializer(read_only=True)
     image = serializers.ImageField(use_url=True, required=False)
     body = serializers.CharField(
         min_length=20,
@@ -44,12 +41,10 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = (
             "post_id",
-            "author",
             "image",
             "body",
             "tags",
             "taglist",
-            "slug",
             "likes_count",
             "created_at",
             "updated_at",
@@ -57,13 +52,10 @@ class PostSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "created_at",
             "updated_at",
-            "author",
             "tags",
         )
-
     def create(self, validated_data: Any) -> Any:
         """set current user as author"""
-        validated_data["author"] = self.context.get("request").user  # type: ignore[union-attr]
         taglist = validated_data.pop("taglist")
         post = super().create(validated_data)
         tags = []
