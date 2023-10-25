@@ -23,9 +23,11 @@ class PostSerializer(serializers.ModelSerializer):
     post_id = serializers.CharField(
         read_only=True,
     )
-    image = serializers.ImageField(use_url=True, required=False)
+    image = serializers.CharField(
+        min_length=5,
+    )
     body = serializers.CharField(
-        min_length=20,
+        min_length=5,
     )
     tags = serializers.SlugRelatedField(
         many=True,

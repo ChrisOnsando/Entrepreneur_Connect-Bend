@@ -25,7 +25,7 @@ class Post(TimeStampedModel):
         max_length=255,
         primary_key=True,
     )
-    image = CloudinaryField("post_images", blank=True, null=True)
+    image = models.TextField(blank=True, null=True)
     body = models.TextField()
     tags = models.ManyToManyField(Tag, blank=True, related_name="tags")
     likesCount = models.BigIntegerField(
