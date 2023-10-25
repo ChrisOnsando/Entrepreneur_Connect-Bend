@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from app.posts.models import Post, Tag
+from app.user.serializers import UserSerializer
 
 User = get_user_model()
 
@@ -23,6 +24,7 @@ class PostSerializer(serializers.ModelSerializer):
     post_id = serializers.CharField(
         read_only=True,
     )
+    author = UserSerializer(read_only=True)
     image = serializers.CharField(
         min_length=5,
     )
@@ -43,6 +45,7 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = (
             "post_id",
+            "author",
             "image",
             "body",
             "tags",
@@ -55,9 +58,11 @@ class PostSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "tags",
+            "author",
         )
     def create(self, validated_data: Any) -> Any:
         """set current user as author"""
+        validated_data["author"] = self.context.get("request").user  # type: ignore[union-attr]
         taglist = validated_data.pop("taglist")
         post = super().create(validated_data)
         tags = []

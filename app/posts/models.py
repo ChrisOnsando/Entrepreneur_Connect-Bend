@@ -38,6 +38,10 @@ class Post(TimeStampedModel):
     dislikes = models.ManyToManyField(
         User, related_name="dislike", blank=True
     )
+    author = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name="author", null=True
+    )
+
 
     class Meta:
         ordering = ["-created_at"]
