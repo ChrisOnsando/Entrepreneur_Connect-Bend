@@ -16,30 +16,32 @@ class UserManager(BaseUserManager):
     use_in_migrations: Literal[True]
 
     def _create_user(
-        self, username: str, email: str, password: str, **kwargs: Any
+        self, username: str, email: str, password: str, image: str, **kwargs: Any
     ) -> Any:
         """
-        Create and save a user with the given username, email, and password.
+        Create and save a user with the given username, email, image, and password.
         """
         if not username:
             raise ValueError("The given username must be set")
         if not email:
             raise ValueError("The given email must be set")
+        if not image:
+            raise ValueError("The given image must be set")
         email = self.normalize_email(email)
-        user = self.model(username=username, email=email, **kwargs)
+        user = self.model(username=username, email=email, image=image, **kwargs)
         user.set_password(password)
         user.save()
         return user
 
     def create_user(
-        self, username: str, email: str, password: str, **kwargs: Any
+        self, username: str, email: str, password: str, image: str, **kwargs: Any
     ) -> Any:
         kwargs.setdefault("is_staff", False)
         kwargs.setdefault("is_superuser", False)
-        return self._create_user(username, email, password, **kwargs)
-
+        return self._create_user(username, email, password, image=image, **kwargs)
+ 
     def create_superuser(
-        self, username: str, email: str, password: str, **kwargs: Any
+        self, username: str, email: str, password: str, image: str, **kwargs: Any
     ) -> Any:
         kwargs.setdefault("is_staff", True)
         kwargs.setdefault("is_superuser", True)
@@ -51,7 +53,7 @@ class UserManager(BaseUserManager):
         if kwargs.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        return self._create_user(username, email, password, **kwargs)
+        return self._create_user(username, email, password,image **kwargs)
 
 
 class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
@@ -72,6 +74,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     email = models.EmailField(
         unique=True,
     )
+    image = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(
         _("active"),
         default=True,
@@ -90,7 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     is_verified = models.BooleanField(default=False)
 
     objects = UserManager()
-    REQUIRED_FIELDS = ["username", "password"]
+    REQUIRED_FIELDS = ["username", "password", "image"]
     USERNAME_FIELD = "email"
 
 class Profile(models.Model):
