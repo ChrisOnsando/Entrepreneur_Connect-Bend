@@ -6,6 +6,8 @@ from app.posts.views import (
     PostDetailView,
     PostCommentView,
     PostCommentDetailView,
+    PostCommentListView,
+    PostCommentListDetailView,
     PostLikeView,
     PostDislikeView,
 )
@@ -24,7 +26,18 @@ urlpatterns = [
         PostCommentDetailView.as_view(),
         name="comment-delete",
     ),
+    path(
+        "comment/",
+        PostCommentListView.as_view(),
+        name="all-comments",
+    ),
+
      path(
+        "comment/<str:post_id>/",
+        PostCommentListDetailView.as_view(),
+        name="comment-specific",
+    ),
+    path(
         "likes/<str:post_id>/like/",
         PostLikeView.as_view(),
         name="like",

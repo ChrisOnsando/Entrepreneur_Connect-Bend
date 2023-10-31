@@ -97,6 +97,21 @@ class PostCommentView(generics.ListCreateAPIView):
     renderer_classes = (JSONRenderer,)
 
 
+class PostCommentListView(generics.ListAPIView):
+    serializer_class = PostCommentSerializer
+    queryset = PostComment.objects.all()
+    permission_classes = [IsAuthenticated]
+    renderer_classes = (JSONRenderer,)
+
+
+class PostCommentListDetailView(generics.ListAPIView):
+    serializer_class = PostCommentSerializer
+    queryset = PostComment.objects.all()
+    permission_classes = [IsAuthenticated]
+    renderer_classes = (JSONRenderer,)
+    lookup_field = "post_id"
+
+
 class PostCommentDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = PostCommentSerializer
     queryset = PostComment.objects.all()
