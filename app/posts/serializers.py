@@ -4,7 +4,11 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from app.posts.models import Post, Tag
+from app.posts.models import(
+    Post, 
+    Tag, 
+    PostComment,
+)
 from app.user.serializers import UserSerializer
 
 User = get_user_model()
@@ -40,6 +44,8 @@ class PostSerializer(serializers.ModelSerializer):
         write_only=True,
     )
     likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Post
@@ -51,6 +57,7 @@ class PostSerializer(serializers.ModelSerializer):
             "tags",
             "taglist",
             "likes_count",
+            "dislikes_count",
             "created_at",
             "updated_at",
         )
@@ -75,3 +82,61 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_likes_count(self, instance: Any) -> Any:
         return instance.likes.count()
+    def get_dislikes_count(self, instance: Any) -> Any:
+        return instance.dislikes.count()
+    
+class LikeSerializer(serializers.Serializer):
+    def update(self, instance: Any, validated_data: Any) -> Any:
+        """
+        update the likes of an post
+        """
+        request = self.context.get("request")
+
+        if request.user in instance.likes.all():  # type: ignore[union-attr]
+            instance.likes.remove(request.user)  # type: ignore[union-attr]
+            return instance
+        if request.user in instance.dislikes.all():  # type: ignore[union-attr]
+            instance.dislikes.remove(request.user)  # type: ignore[union-attr]
+        instance.likes.add(request.user)  # type: ignore[union-attr]
+        return instance
+
+class DislikeSerializer(serializers.Serializer):
+    def update(self, instance: Any, validated_data: Any) -> Any:
+        """update the dislikes of a post"""
+        request = self.context.get("request")
+
+        if request.user in instance.dislikes.all():  # type: ignore[union-attr]
+            instance.dislikes.remove(request.user)  # type: ignore[union-attr]
+            return instance
+        if request.user in instance.likes.all():  # type: ignore[union-attr]
+            instance.likes.remove(request.user)  # type: ignore[union-attr]
+        instance.dislikes.add(request.user)  # type: ignore[union-attr]
+        return instance
+    
+class PostCommentSerializer(serializers.ModelSerializer):
+    """
+    Comments Serializer
+    """
+
+    commenter = UserSerializer(read_only=True)
+
+    class Meta:
+        model = PostComment
+        fields = (
+            "id",
+            "commenter",
+            "comment",
+            "post",
+            "created_at",
+        )
+        read_only_fields = (
+            "created_at",
+            "commenter",
+            "id",
+        )
+
+    def create(self, validated_data: Any) -> Any:
+        request = self.context["request"]
+        validated_data["commenter"] = request.user
+        instance = PostComment.objects.create(**validated_data)
+        return instance

@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import pre_save
 
-from app.abstracts import TimeStampedModel
+from app.abstracts import TimeStampedModel, UniversalIdModel
 
 User = get_user_model()
 
@@ -48,3 +48,16 @@ class Post(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.title
+
+class PostComment(TimeStampedModel, UniversalIdModel):
+    """
+    Comment model to store comments made on posts
+    """
+
+    commenter = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    comment = models.TextField()
+
+    class Meta:
+        ordering = ["created_at"]
+        
